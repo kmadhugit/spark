@@ -96,14 +96,16 @@ private[spark] object UserTaskMetrics {
     */
   def stringValue(valuesInput: Seq[Any]): String = {
     var valStr = ""
-    val values = valuesInput.map(valuesTmp => {
-      val vtmp = valuesInput.asInstanceOf[ArrayBuffer[String]].mkString("")
-      if (vtmp.contains(":")) {
-        valStr = vtmp.split(":")(0)
-        vtmp.split(":")(1).toLong
-      } else {
-        vtmp.toLong
-      }
+
+    val values = valuesInput.flatMap(valuesTmp => {
+      valuesInput.asInstanceOf[ArrayBuffer[String]].map(vtmp => {
+        if (vtmp.contains(":")) {
+          valStr = vtmp.split(":")(0)
+          vtmp.split(":")(1).toLong
+        } else {
+          vtmp.toLong
+        }
+      })
     })
 
     val numberFormat = NumberFormat.getInstance()

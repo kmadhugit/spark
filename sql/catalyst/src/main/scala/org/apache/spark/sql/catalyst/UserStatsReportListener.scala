@@ -54,7 +54,7 @@ class UserStatsReportListener extends SparkListener with Logging {
     accumulatorUpdates.groupBy(_._1).map { case (accumulatorId, values) =>
       accumulatorId ->
         UserTaskMetrics.stringValue(values.map(_._2))
-    }.foreach(x => this.logInfo(x._1 + " : " + x._2))
+    }.foreach(x => this.logError(x._1 + " : " + x._2))
   
     taskInfoMetrics.clear()
   }
