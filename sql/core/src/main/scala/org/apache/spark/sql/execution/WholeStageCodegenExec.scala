@@ -19,7 +19,7 @@ package org.apache.spark.sql.execution
 
 import org.apache.spark.{broadcast, TaskContext}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.{InternalRow, UserTaskMetrics}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.codegen._
 import org.apache.spark.sql.catalyst.plans.physical.Partitioning
@@ -310,6 +310,10 @@ case class WholeStageCodegenExec(child: SparkPlan) extends UnaryExecNode with Co
    */
   def doCodeGen(): (CodegenContext, CodeAndComment) = {
     val ctx = new CodegenContext
+    UserTaskMetrics.metricTerm(ctx, "userDefined1", "WholeStage User Defined Sum Metrics 1")
+    UserTaskMetrics.metricTerm(ctx, "userDefined2", "WholeStage User Defined Sum Metrics 2")
+    UserTaskMetrics.metricTerm(ctx, "userDefined3", "WholeStage User Defined Sum Metrics 3")
+    UserTaskMetrics.metricTerm(ctx, "userDefined4", "WholeStage User Defined Sum Metrics 4")
     val code = child.asInstanceOf[CodegenSupport].produce(ctx, this)
     val source = s"""
       public Object generate(Object[] references) {
