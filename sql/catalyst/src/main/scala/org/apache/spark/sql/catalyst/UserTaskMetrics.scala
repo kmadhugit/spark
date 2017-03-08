@@ -70,20 +70,7 @@ private[spark] object UserTaskMetrics {
     if (acc.isAtDriverSide) {
       val taskContext = TaskContext.get()
       if (taskContext != null) {
-        acc.metadata.name match {
-          // scalastyle:off println
-          case Some(x) => println("User Register Accumulator : " + x)
-          // scalastyle:on
-          case None => println("User Register Accumulator : None ")
-        }
         taskContext.registerAccumulator(acc)
-      }
-    } else {
-      acc.metadata.name match {
-        // scalastyle:off println
-        case Some(x) => println("User Driver Register Accumulator : " + x)
-        // scalastyle:on
-        case None => println("User Driver Register Accumulator : None ")
       }
     }
   }

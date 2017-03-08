@@ -22,6 +22,7 @@ import java.io.ObjectInputStream
 import com.esotericsoftware.kryo.{Kryo, KryoSerializable}
 import com.esotericsoftware.kryo.io.{Input, Output}
 
+import org.apache.spark.sql.catalyst.UserTaskMetrics
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
@@ -123,6 +124,11 @@ object GenerateOrdering extends CodeGenerator[Seq[SortOrder], Ordering[InternalR
 
   protected def create(ordering: Seq[SortOrder]): BaseOrdering = {
     val ctx = newCodeGenContext()
+    UserTaskMetrics.metricTerm(ctx, "userDefined1", "Ordering User Defined Sum Metrics 1")
+    UserTaskMetrics.metricTerm(ctx, "userDefined2", "Ordering User Defined Sum Metrics 2")
+    UserTaskMetrics.metricTerm(ctx, "userDefined3", "Ordering User Defined Sum Metrics 3")
+    UserTaskMetrics.metricTerm(ctx, "userDefined4", "Ordering User Defined Sum Metrics 4")
+
     val comparisons = genComparisons(ctx, ordering)
     val codeBody = s"""
       public SpecificOrdering generate(Object[] references) {
