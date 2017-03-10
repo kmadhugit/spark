@@ -140,10 +140,10 @@ object GenerateSafeProjection extends CodeGenerator[Seq[Expression], Projection]
 
   protected def create(expressions: Seq[Expression]): Projection = {
     val ctx = newCodeGenContext()
-    UserTaskMetrics.metricTerm(ctx, "userDefined1", "SafeProj User Defined Sum Metrics 1")
-    UserTaskMetrics.metricTerm(ctx, "userDefined2", "SafeProj User Defined Sum Metrics 2")
-    UserTaskMetrics.metricTerm(ctx, "userDefined3", "SafeProj User Defined Sum Metrics 3")
-    UserTaskMetrics.metricTerm(ctx, "userDefined4", "SafeProj User Defined Sum Metrics 4")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined1", "SafeProj User Defined Sum Metrics 1")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined2", "SafeProj User Defined Sum Metrics 2")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined3", "SafeProj User Defined Sum Metrics 3")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined4", "SafeProj User Defined Sum Metrics 4")
 
     val expressionCodes = expressions.zipWithIndex.map {
       case (NoOp, _) => ""

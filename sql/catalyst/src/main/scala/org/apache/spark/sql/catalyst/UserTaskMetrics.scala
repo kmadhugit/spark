@@ -70,8 +70,11 @@ private[spark] object UserTaskMetrics {
     if (acc.isAtDriverSide) {
       val taskContext = TaskContext.get()
       if (taskContext != null) {
+        acc.flipDriverSide
         taskContext.registerAccumulator(acc)
       }
+    } else {
+      acc.flipDriverSide
     }
   }
 
@@ -80,11 +83,15 @@ private[spark] object UserTaskMetrics {
   def createMetric(sc: SparkContext, name: String): UserTaskMetric = {
     val acc = new UserTaskMetric()
     acc.register(sc, name = Some(name), countFailedValues = false)
-    // registerWithTaskContext(acc)
     acc
   }
 
   def metricTerm(ctx: CodegenContext, name: String, desc: String): String = {
+    val acc = createMetric(sc, desc)
+    ctx.addReferenceObj(name, acc )
+  }
+
+  def metricTermWithRegister(ctx: CodegenContext, name: String, desc: String): String = {
     val acc = createMetric(sc, desc)
     UserTaskMetrics.registerWithTaskContext(acc)
     ctx.addReferenceObj(name, acc )

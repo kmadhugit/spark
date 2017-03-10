@@ -32,7 +32,7 @@ import scala.language.existentials
 import org.apache.spark.{DebugMetrics, SparkEnv}
 import org.apache.spark.internal.Logging
 import org.apache.spark.metrics.source.CodegenMetrics
-import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.{InternalRow, UserTaskMetric}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.util.{ArrayData, MapData}
 import org.apache.spark.sql.types._
@@ -922,7 +922,8 @@ object CodeGenerator extends Logging {
       classOf[UnsafeArrayData].getName,
       classOf[MapData].getName,
       classOf[UnsafeMapData].getName,
-      classOf[Expression].getName
+      classOf[Expression].getName,
+      classOf[UserTaskMetric].getName
     ))
     evaluator.setExtendedClass(classOf[GeneratedClass])
 

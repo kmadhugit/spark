@@ -124,10 +124,10 @@ object GenerateOrdering extends CodeGenerator[Seq[SortOrder], Ordering[InternalR
 
   protected def create(ordering: Seq[SortOrder]): BaseOrdering = {
     val ctx = newCodeGenContext()
-    UserTaskMetrics.metricTerm(ctx, "userDefined1", "Ordering User Defined Sum Metrics 1")
-    UserTaskMetrics.metricTerm(ctx, "userDefined2", "Ordering User Defined Sum Metrics 2")
-    UserTaskMetrics.metricTerm(ctx, "userDefined3", "Ordering User Defined Sum Metrics 3")
-    UserTaskMetrics.metricTerm(ctx, "userDefined4", "Ordering User Defined Sum Metrics 4")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined1", "Ordering User Defined Sum Metrics 1")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined2", "Ordering User Defined Sum Metrics 2")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined3", "Ordering User Defined Sum Metrics 3")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined4", "Ordering User Defined Sum Metrics 4")
 
     val comparisons = genComparisons(ctx, ordering)
     val codeBody = s"""

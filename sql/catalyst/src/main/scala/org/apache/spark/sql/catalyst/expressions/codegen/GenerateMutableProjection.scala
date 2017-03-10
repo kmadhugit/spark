@@ -53,10 +53,10 @@ object GenerateMutableProjection extends CodeGenerator[Seq[Expression], MutableP
       expressions: Seq[Expression],
       useSubexprElimination: Boolean): MutableProjection = {
     val ctx = newCodeGenContext()
-    UserTaskMetrics.metricTerm(ctx, "userDefined1", "MutableProj User Defined Sum Metrics 1")
-    UserTaskMetrics.metricTerm(ctx, "userDefined2", "MutableProj User Defined Sum Metrics 2")
-    UserTaskMetrics.metricTerm(ctx, "userDefined3", "MutableProj User Defined Sum Metrics 3")
-    UserTaskMetrics.metricTerm(ctx, "userDefined4", "MutableProj User Defined Sum Metrics 4")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined1", "MutableProj User Defined Sum Metrics 1")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined2", "MutableProj User Defined Sum Metrics 2")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined3", "MutableProj User Defined Sum Metrics 3")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined4", "MutableProj User Defined Sum Metrics 4")
 
     val (validExpr, index) = expressions.zipWithIndex.filter {
       case (NoOp, _) => false

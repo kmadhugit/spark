@@ -47,10 +47,10 @@ object GeneratePredicate extends CodeGenerator[Expression, Predicate] {
 
   protected def create(predicate: Expression): Predicate = {
     val ctx = newCodeGenContext()
-    UserTaskMetrics.metricTerm(ctx, "userDefined1", "Predicate User Defined Sum Metrics 1")
-    UserTaskMetrics.metricTerm(ctx, "userDefined2", "Predicate User Defined Sum Metrics 2")
-    UserTaskMetrics.metricTerm(ctx, "userDefined3", "Predicate User Defined Sum Metrics 3")
-    UserTaskMetrics.metricTerm(ctx, "userDefined4", "Predicate User Defined Sum Metrics 4")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined1", "Predicate User Defined Sum Metrics 1")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined2", "Predicate User Defined Sum Metrics 2")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined3", "Predicate User Defined Sum Metrics 3")
+    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined4", "Predicate User Defined Sum Metrics 4")
 
     val eval = predicate.genCode(ctx)
 
