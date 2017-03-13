@@ -22,7 +22,7 @@ import java.text.NumberFormat
 import org.apache.spark.scheduler.AccumulableInfo
 import org.apache.spark.sql.catalyst.expressions.codegen.CodegenContext
 import org.apache.spark.util.{AccumulatorContext, AccumulatorV2}
-import org.apache.spark.{SparkContext, TaskContext}
+import org.apache.spark.{SparkContext, SparkEnv, TaskContext}
 import scala.collection.mutable.ArrayBuffer
 
 class UserTaskMetric(initValue: Long = 0L)
@@ -78,23 +78,29 @@ private[spark] object UserTaskMetrics {
     }
   }
 
-  private val sc = SparkContext.getOrCreate()
+  // val sc = SparkContext.getOrCreate(SparkEnv.get.conf)
 
-  def createMetric(sc: SparkContext, name: String): UserTaskMetric = {
+  def createMetric(name: String): UserTaskMetric = {
+    val sc = SparkContext.getOrCreate(SparkEnv.get.conf)
     val acc = new UserTaskMetric()
     acc.register(sc, name = Some(name), countFailedValues = false)
     acc
   }
 
   def metricTerm(ctx: CodegenContext, name: String, desc: String): String = {
-    val acc = createMetric(sc, desc)
+    val acc = createMetric(desc)
     ctx.addReferenceObj(name, acc )
   }
 
   def metricTermWithRegister(ctx: CodegenContext, name: String, desc: String): String = {
-    val acc = createMetric(sc, desc)
-    UserTaskMetrics.registerWithTaskContext(acc)
-    ctx.addReferenceObj(name, acc )
+     val str = if (SparkEnv.get.executorId == "driver") {
+       val acc = createMetric(desc)
+       UserTaskMetrics.registerWithTaskContext(acc)
+       ctx.addReferenceObj(name, acc )
+     } else {
+       ""
+     }
+     str
   }
 
   /**
