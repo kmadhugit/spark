@@ -20,6 +20,7 @@ package org.apache.spark.sql.catalyst.expressions.codegen
 import scala.annotation.tailrec
 
 import org.apache.spark.sql.catalyst.UserTaskMetrics
+import scala.collection.mutable.ArrayBuffer
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate.NoOp
 import org.apache.spark.sql.catalyst.util.{ArrayBasedMapData, GenericArrayData}
@@ -138,13 +139,24 @@ object GenerateSafeProjection extends CodeGenerator[Seq[Expression], Projection]
     case _ => ExprCode("", "false", input)
   }
 
+  override def generate(
+                expressions: Seq[Expression],
+                references: ArrayBuffer[Any]): Projection = {
+    create(expressions, references)
+  }
+
+  protected def create(expressions: Seq[Expression], ref: ArrayBuffer[Any]): Projection = {
+    val ctx = newCodeGenContext()
+    UserTaskMetrics.addMetrics(ctx, ref)
+    create(expressions, ctx)
+  }
+
   protected def create(expressions: Seq[Expression]): Projection = {
     val ctx = newCodeGenContext()
-    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined1", "SafeProj User Defined Sum Metrics 1")
-    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined2", "SafeProj User Defined Sum Metrics 2")
-    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined3", "SafeProj User Defined Sum Metrics 3")
-    UserTaskMetrics.metricTermWithRegister(ctx, "userDefined4", "SafeProj User Defined Sum Metrics 4")
+    create(expressions, ctx)
+  }
 
+  protected def create(expressions: Seq[Expression], ctx: CodegenContext): Projection = {
     val expressionCodes = expressions.zipWithIndex.map {
       case (NoOp, _) => ""
       case (e, i) =>

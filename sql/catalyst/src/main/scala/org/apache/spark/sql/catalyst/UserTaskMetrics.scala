@@ -92,6 +92,13 @@ private[spark] object UserTaskMetrics {
     ctx.addReferenceObj(name, acc )
   }
 
+  def addMetrics(ctx: CodegenContext, ref: ArrayBuffer[Any]): Unit = {
+    ref.zipWithIndex.foreach {
+      case (obj, index) =>
+        ctx.addReferenceObj("usermetrics_" + index, obj)
+    }
+  }
+
   def metricTermWithRegister(ctx: CodegenContext, name: String, desc: String): String = {
      val str = if (SparkEnv.get.executorId == "driver") {
        val acc = createMetric(desc)
