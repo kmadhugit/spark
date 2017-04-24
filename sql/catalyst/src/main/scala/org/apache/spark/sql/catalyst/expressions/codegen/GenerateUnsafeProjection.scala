@@ -19,6 +19,8 @@ package org.apache.spark.sql.catalyst.expressions.codegen
 
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.catalyst.UserTaskMetrics
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Generates a [[Projection]] that returns an [[UnsafeRow]].
@@ -355,14 +357,44 @@ object GenerateUnsafeProjection extends CodeGenerator[Seq[Expression], UnsafePro
     create(canonicalize(expressions), subexpressionEliminationEnabled)
   }
 
+  override def generate(expressions: Seq[Expression],
+                        ref: ArrayBuffer[Any]): UnsafeProjection = {
+
+    create(canonicalize(expressions), ref)
+  }
+
   protected def create(references: Seq[Expression]): UnsafeProjection = {
     create(references, subexpressionEliminationEnabled = false)
   }
 
+  protected def create(references: Seq[Expression],
+                       ctxReferences: ArrayBuffer[Any]): UnsafeProjection = {
+    create(references, subexpressionEliminationEnabled = false, ctxReferences)
+  }
+
   private def create(
-      expressions: Seq[Expression],
-      subexpressionEliminationEnabled: Boolean): UnsafeProjection = {
+                      expressions: Seq[Expression],
+                      subexpressionEliminationEnabled: Boolean,
+                      references: ArrayBuffer[Any]): UnsafeProjection = {
     val ctx = newCodeGenContext()
+
+    UserTaskMetrics.addMetrics(ctx, references)
+
+    create(expressions, subexpressionEliminationEnabled, ctx)
+  }
+
+  private def create(
+                      expressions: Seq[Expression],
+                      subexpressionEliminationEnabled: Boolean): UnsafeProjection = {
+    val ctx = newCodeGenContext()
+    create(expressions, subexpressionEliminationEnabled, ctx)
+
+  }
+
+  private def create(
+                      expressions: Seq[Expression],
+                      subexpressionEliminationEnabled: Boolean,
+                      ctx: CodegenContext): UnsafeProjection = {
     val eval = createCode(ctx, expressions, subexpressionEliminationEnabled)
 
     val codeBody = s"""

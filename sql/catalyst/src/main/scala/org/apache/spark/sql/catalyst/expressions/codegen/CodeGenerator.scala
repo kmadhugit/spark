@@ -32,7 +32,7 @@ import scala.language.existentials
 import org.apache.spark.{DebugMetrics, SparkEnv}
 import org.apache.spark.internal.Logging
 import org.apache.spark.metrics.source.CodegenMetrics
-import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.{InternalRow, UserTaskMetric}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.util.{ArrayData, MapData}
 import org.apache.spark.sql.types._
@@ -872,6 +872,15 @@ abstract class CodeGenerator[InType <: AnyRef, OutType <: AnyRef] extends Loggin
   /** Generates the requested evaluator given already bound expression(s). */
   def generate(expressions: InType): OutType = create(canonicalize(expressions))
 
+  /** Generates the requested evaluator binding the given expression(s) to the inputSchema. */
+  def generate(expressions: InType, inputSchema: Seq[Attribute],
+               ref: ArrayBuffer[Any]): OutType =
+    generate(bind(expressions, inputSchema), ref)
+
+  /** Generates the requested evaluator given already bound expression(s). */
+  def generate(expressions: InType, ref: ArrayBuffer[Any]): OutType =
+    create(canonicalize(expressions))
+
   /**
    * Create a new codegen context for expression evaluator, used to store those
    * expressions that don't support codegen
@@ -922,7 +931,8 @@ object CodeGenerator extends Logging {
       classOf[UnsafeArrayData].getName,
       classOf[MapData].getName,
       classOf[UnsafeMapData].getName,
-      classOf[Expression].getName
+      classOf[Expression].getName,
+      classOf[UserTaskMetric].getName
     ))
     evaluator.setExtendedClass(classOf[GeneratedClass])
 

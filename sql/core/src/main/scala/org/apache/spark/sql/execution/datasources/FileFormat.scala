@@ -23,11 +23,12 @@ import org.apache.hadoop.io.compress.{CompressionCodecFactory, SplittableCompres
 import org.apache.hadoop.mapreduce.Job
 
 import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.{InternalRow, UserTaskMetrics}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.codegen.GenerateUnsafeProjection
 import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.StructType
+import scala.collection.mutable
 
 
 /**
@@ -119,14 +120,23 @@ trait FileFormat {
     val dataReader = buildReader(
       sparkSession, dataSchema, partitionSchema, requiredSchema, filters, options, hadoopConf)
 
+    val references: mutable.ArrayBuffer[Any] = new mutable.ArrayBuffer[Any]()
+
+    references += UserTaskMetrics.createMetric("UnSafe User Defined Sum Metrics 1")
+    references += UserTaskMetrics.createMetric("UnSafe User Defined Sum Metrics 2")
+    references += UserTaskMetrics.createMetric("UnSafe User Defined Sum Metrics 3")
+    references += UserTaskMetrics.createMetric("UnSafe User Defined Sum Metrics 4")
+
     new (PartitionedFile => Iterator[InternalRow]) with Serializable {
       private val fullSchema = requiredSchema.toAttributes ++ partitionSchema.toAttributes
 
       private val joinedRow = new JoinedRow()
 
+
       // Using lazy val to avoid serialization
       private lazy val appendPartitionColumns =
-        GenerateUnsafeProjection.generate(fullSchema, fullSchema)
+        GenerateUnsafeProjection.generate(fullSchema, fullSchema,
+          references)
 
       override def apply(file: PartitionedFile): Iterator[InternalRow] = {
         // Using local val to avoid per-row lazy val check (pre-mature optimization?...)

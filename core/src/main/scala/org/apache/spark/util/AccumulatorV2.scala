@@ -152,6 +152,8 @@ abstract class AccumulatorV2[IN, OUT] extends Serializable {
    */
   def value: OUT
 
+  def flipDriverSide: Unit = atDriverSide = if (atDriverSide) false else true
+
   // Called by Java when serializing an object
   final protected def writeReplace(): Any = {
     if (atDriverSide) {
