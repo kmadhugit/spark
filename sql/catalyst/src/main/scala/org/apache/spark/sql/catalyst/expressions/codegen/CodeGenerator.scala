@@ -1002,14 +1002,26 @@ object CodeGenerator extends Logging {
           val j = DebugMetrics.getJobId()
           val s = DebugMetrics.getStageId()
           val t = DebugMetrics.getTaskType()
-          val fname = s"${q}_jobid_${j}_stageid_${s}_${t}_${cnt}_execid_${executorId}"
+          val taskId = DebugMetrics.getTaskId()
+          val hc = code.hashCode()
+          val fname = s"${q}_jobid_${j}_stageid_${s}_taskid_${taskId}_${t}_${cnt}_execid_${executorId}_${hc}"
           var code1 : CodeAndComment = code;
 
           try {
-            val source = scala.io.Source.fromFile(s"/tmp/catalyst-input/${fname}.java")
+            def getFilesMatchingRegex(dir: String, regex: util.matching.Regex) = {
+              new java.io.File(dir).listFiles
+                .filter(file => regex.findFirstIn(file.getName).isDefined)
+                .head
+            }
+            val regexp = ".*" + code1.hashCode() +  "\\.java"
+            val mFile = getFilesMatchingRegex("/tmp/catalyst-input", regexp.r)
+            val mFileName = mFile.getPath()
+            println(s"Kavana ${fname} matched ${mFileName}")
+            val source = scala.io.Source.fromFile(mFileName)
             val lines = try source.mkString finally source.close()
             code1 = new CodeAndComment(lines,Map[String,String]())
-            println(s"MADHU using Custom Java code for ${fname} executor id ${executorId}")
+            val newHc = code1.hashCode()
+            println(s"Kavana using Custom Java code for ${fname} with HashCode ${newHc}")
           }
           catch {
             case _ : Throwable => {}
