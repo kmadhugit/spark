@@ -5,23 +5,24 @@ package org.apache.spark
   */
 object DebugMetrics {
 
-  case class jobdetails(query: String, taskType : String, jobId : Int, stageId : Int)
+  case class jobdetails(query: String, taskType : String, jobId : Int, stageId : Int, taskId: Long)
   val s = new ThreadLocal[jobdetails];
 
   def get() = {
     if(s.get() == null)
-      jobdetails("unknown","unknown",-1,-1)
+      jobdetails("unknown","unknown",-1,-1,-1)
     else
       s.get()
   }
 
-  def set(query : String, taskType : String, jobId : Int, stageId : Int) = {
-    s.set(jobdetails(query,taskType,jobId,stageId))
+  def set(query : String, taskType : String, jobId : Int, stageId : Int, taskId : Long) = {
+    s.set(jobdetails(query,taskType,jobId,stageId,taskId))
   }
 
   def getTaskType() = get().taskType
   def getJobId() = get.jobId
   def getStageId() = get.stageId
   def getQuery() = get().query
+  def getTaskId() = get().taskId
 
 }

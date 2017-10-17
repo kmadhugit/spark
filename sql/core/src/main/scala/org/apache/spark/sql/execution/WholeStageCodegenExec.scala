@@ -534,4 +534,4 @@ case class CollapseCodegenStages(conf: SQLConf) extends Rule[SparkPlan] {
       plan
     }
   }
-}
+} 
